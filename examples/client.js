@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var container = require('rhea');
+let container = require('rhea');
+const initTracer = require('./Tracing/tracing').testTracer;
+const tracer = new initTracer('client');
+const abc = require('./Tracing/tracing').client
+
+
 
 var args = require('./options.js').options({
     'n': { alias: 'node', default: 'examples', describe: 'name of node (e.g. queue) to which messages are sent'},
@@ -21,13 +26,17 @@ var args = require('./options.js').options({
     'p': { alias: 'port', default: 5672, describe: 'port to connect to'}
 }).help('help').argv;
 
+
 var requests = [
     'Twas brillig, and the slithy toves',
     'Did gire and gymble in the wabe.',
     'All mimsy were the borogroves,',
     'And the mome raths outgrabe.'
 ];
-var sender;
+
+const clientObj = new abc(`${args.host}:${args.port}/${args.node}`, requests, tracer.tracer);
+
+// var sender;
 
 function next_request(context) {
     if (context.receiver.source.address) {
@@ -53,3 +62,10 @@ container.on('message', function (context) {
 });
 
 container.connect({port: args.port, host: args.host});
+const tracerObj = tracer.tracer.startSpan('client-requests');
+
+
+setTimeout(()=> { 
+    tracerObj.finish();
+    console.log("all done")
+}, 15000);
