@@ -16,7 +16,7 @@
 let container = require('rhea');
 const initTracer = require('./Tracing/tracing').testTracer;
 const tracer = new initTracer('client');
-const abc = require('./Tracing/tracing').client
+const abc = require('./Tracing/client_common').client
 
 
 
